@@ -3,39 +3,42 @@ var express = require('express')
   , bodyParser = require('body-parser')
 
 var fs = require('fs')
+var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 
 var app = express()
-app.use(bodyParser())
+  app.use(bodyParser())
+  app.use(passport.initialize());
 
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 
 var db = mongoskin.db('mongodb://@localhost:27017/authTestProject', {safe:true})
 
-var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 
 var bcrypt = require('bcrypt-nodejs');
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    var collection = db.collection("user");
-
-    console.log("pwcheck running")
-
-    
-
-    User.findOne({ username: username }, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
+    var collection = db.collection("user")
+    collection.find({"username" : username}).toArray(function(e, results) {
+      if (e) { return done(err); }
+      if (results.length == 0) {
+        // user does not exist
+        return done(null, false, { message: 'Incorrect username or password.' });
+      } else {
+        // incorrect password
+        bcrypt.compare(password, results[0].password, function(err, isMatch) {
+            if (err) return done(err);
+            if (isMatch) {
+              return done(null, {});        
+            } else {
+              return done(null, false, { message: 'Incorrect username or password.'});
+            }
+        });            
+        }
+    })
+  })
+);
 
 app.post('/user', function(req, res, next) {
   var collection = db.collection("user")
@@ -62,7 +65,7 @@ app.post('/user', function(req, res, next) {
   })
 })
 
-app.get('/candy', passport.authenticate('local'), function(req, res, next) {
+app.get('/candy', passport.authenticate('local',  {session:false}), function(req, res, next) {
   res.status(200)
   res.send()
 })
