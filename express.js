@@ -66,8 +66,6 @@ passport.use(new BasicStrategy(
 
 app.post('/user', function(req, res, next) {
   var collection = db.collection("user")
-  console.log(req.body)
-  console.log(req.body.user)
   collection.find({"username" : req.body.user}).toArray(function(e, results) {
     if (e) return next(e)
   
@@ -93,9 +91,23 @@ app.post('/user', function(req, res, next) {
   })
 })
 
+app.post('/candy', passport.authenticate('basic',  {session:false}), function(req, res, next) {
+  var collection = db.collection("candy")
+
+  collection.insert(req.body, {}, function(e, results){
+    if (e) return next(e)
+    res.send(results) 
+  })
+})
+
 app.get('/candy', passport.authenticate('basic',  {session:false}), function(req, res, next) {
-  res.status(200)
-  res.send()
+  var candies = [];
+  var collection = db.collection("candy")
+
+  collection.find({} ,{}).toArray(function(e, results){
+    if (e) return next(e)
+    res.send(results)
+  })
 })
 
 app.listen(3000)
