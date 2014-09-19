@@ -42,9 +42,13 @@ passport.use(new LocalStrategy(
 
 app.post('/user', function(req, res, next) {
   var collection = db.collection("user")
-  collection.find({"user" : req.body.user}).toArray(function(e, results) {
+  console.log(req.body)
+  console.log(req.body.user)
+  collection.find({"username" : req.body.user}).toArray(function(e, results) {
     if (e) return next(e)
   
+    console.log(results)
+
     if (results.length === 0) {
       // username does not exist yet, insert it
         bcrypt.genSalt(5, function(err, salt) {
@@ -53,7 +57,7 @@ app.post('/user', function(req, res, next) {
           bcrypt.hash(req.body.password, salt, null, function(err, hash) {
             if (err) return callback(err);
               
-            collection.insert({username: req.body.username, password: hash}, {}, function(e, results){
+            collection.insert({username: req.body.user, password: hash}, {}, function(e, results){
               if (e) return next(e)
               res.send(results)
             })

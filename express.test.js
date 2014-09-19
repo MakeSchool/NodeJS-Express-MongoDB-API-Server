@@ -14,7 +14,7 @@ describe('basic api server', function(){
   
   it('can create user accounts', function(done){
     superagent.post('http://localhost:3000/user')
-      .send({ username: 'Ben-G', password: 'testpw' })
+      .send({ user: 'Ben-G', password: 'testpw' })
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(200)
@@ -25,7 +25,7 @@ describe('basic api server', function(){
 
   it('cannot create tow user accounts with the same password', function(done){
     superagent.post('http://localhost:3000/user')
-      .send({ username: 'Ben-G', password: 'testpw' })
+      .send({ user: 'Ben-G', password: 'testpw' })
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(400)
