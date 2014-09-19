@@ -25,7 +25,17 @@ describe('basic api server', function(){
       })
   })
 
-  it('cannot create tow user accounts with the same password', function(done){
+  it('can test credentials', function(done){
+    superagent.get('http://localhost:3000/user')
+      .auth('Ben-G', 'testpw')
+      .end(function(e,res){
+        expect(e).to.eql(null)
+        expect(res.status).to.eql(200)
+        done()
+      })
+  })
+
+  it('cannot create two user accounts with the same password', function(done){
     superagent.post('http://localhost:3000/user')
       .send({ user: 'Ben-G', password: 'testpw' })
       .end(function(e,res){

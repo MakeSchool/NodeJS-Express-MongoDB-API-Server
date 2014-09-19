@@ -64,6 +64,10 @@ passport.use(new BasicStrategy(
   })
 );
 
+app.get('/user', passport.authenticate('basic',  {session:false}), function(req, res, next) {
+  res.status(200).send()
+})
+
 app.post('/user', function(req, res, next) {
   var collection = db.collection("user")
   collection.find({"username" : req.body.user}).toArray(function(e, results) {
