@@ -22,6 +22,8 @@ passport.use(new LocalStrategy(
 
     console.log("pwcheck running")
 
+    
+
     User.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
@@ -37,7 +39,7 @@ passport.use(new LocalStrategy(
 
 app.post('/user', function(req, res, next) {
   var collection = db.collection("user")
-  collection.find({"user" : req.body.user}).toArray(function(e, results){
+  collection.find({"user" : req.body.user}).toArray(function(e, results) {
     if (e) return next(e)
   
     if (results.length === 0) {
@@ -60,13 +62,9 @@ app.post('/user', function(req, res, next) {
   })
 })
 
-app.get('/candy', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-      console.log(err)
-      console.log(info)
-      console.log(user)
-      res.send()
-  })(req, res, next);
+app.get('/candy', passport.authenticate('local'), function(req, res, next) {
+  res.status(200)
+  res.send()
 })
 
 app.listen(3000)
