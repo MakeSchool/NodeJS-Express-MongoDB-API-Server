@@ -60,7 +60,7 @@ describe('basic api server', function(){
   it('can create candies', function(done){
     superagent.post('http://localhost:3000/candy')
       .auth('Ben-G', 'testpw')
-      .send({name:"Chocolate", price:200})
+      .send({name:"Gummy Bears", price:200})
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(200)
@@ -72,7 +72,7 @@ describe('basic api server', function(){
   it('can create candies', function(done){
     superagent.post('http://localhost:3000/candy')
       .auth('Ben-G', 'testpw')
-      .send({name:"Chocolate", price:25})
+      .send({name:"Fruit Snacks", price:25})
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(200)
