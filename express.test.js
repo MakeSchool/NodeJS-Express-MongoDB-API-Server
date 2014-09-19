@@ -57,13 +57,37 @@ describe('basic api server', function(){
     })
   })
 
+  it('can create candies', function(done){
+    superagent.post('http://localhost:3000/candy')
+      .auth('Ben-G', 'testpw')
+      .send({name:"Chocolate", price:200})
+      .end(function(e,res){
+        expect(e).to.eql(null)
+        expect(res.status).to.eql(200)
+        expect(res.body[0].name).to.eql("Gummy Bears")
+        done()
+    })
+  })
+
+  it('can create candies', function(done){
+    superagent.post('http://localhost:3000/candy')
+      .auth('Ben-G', 'testpw')
+      .send({name:"Chocolate", price:25})
+      .end(function(e,res){
+        expect(e).to.eql(null)
+        expect(res.status).to.eql(200)
+        expect(res.body[0].name).to.eql("Fruit Snacks")
+        done()
+    })
+  })
+
   it('can retrieve created candies', function(done) {
     superagent.get('http://localhost:3000/candy')
       .auth('Ben-G', 'testpw')
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(200)
-        expect(res.body.length).to.eql(1)
+        expect(res.body.length).to.eql(3)
         done()
       })
   })
