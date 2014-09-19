@@ -3,7 +3,8 @@ var express = require('express')
   , bodyParser = require('body-parser')
 
 var fs = require('fs')
-var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
+var passport = require('passport'), LocalStrategy = require('passport-local').Strategy, 
+BasicStrategy = require('passport-http').BasicStrategy;
 
 var app = express()
   app.use(bodyParser())
@@ -20,6 +21,29 @@ var bcrypt = require('bcrypt-nodejs');
 passport.use(new LocalStrategy(
   function(username, password, done) {
     var collection = db.collection("user")
+    collection.find({"username" : username}).toArray(function(e, results) {
+      if (e) { return done(err); }
+      if (results.length == 0) {
+        // user does not exist
+        return done(null, false, { message: 'Incorrect username or password.' });
+      } else {
+        // incorrect password
+        bcrypt.compare(password, results[0].password, function(err, isMatch) {
+            if (err) return done(err);
+            if (isMatch) {
+              return done(null, {});        
+            } else {
+              return done(null, false, { message: 'Incorrect username or password.'});
+            }
+        });            
+        }
+    })
+  })
+);
+
+passport.use(new BasicStrategy(
+  function(username, password, done) {
+  var collection = db.collection("user")
     collection.find({"username" : username}).toArray(function(e, results) {
       if (e) { return done(err); }
       if (results.length == 0) {
@@ -69,7 +93,7 @@ app.post('/user', function(req, res, next) {
   })
 })
 
-app.get('/candy', passport.authenticate('local',  {session:false}), function(req, res, next) {
+app.get('/candy', passport.authenticate('basic',  {session:false}), function(req, res, next) {
   res.status(200)
   res.send()
 })

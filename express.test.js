@@ -35,8 +35,7 @@ describe('basic api server', function(){
 
   it('can access candy with correct credentials', function(done){
     superagent.get('http://localhost:3000/candy')
-      .query({ username: 'Ben-G' })
-      .query({ password: 'testpw' })
+      .auth('Ben-G', 'testpw')
       .end(function(e,res){
         expect(e).to.eql(null)
         expect(res.status).to.eql(200)
