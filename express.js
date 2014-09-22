@@ -64,11 +64,11 @@ passport.use(new BasicStrategy(
   })
 );
 
-app.get('/user', passport.authenticate('basic',  {session:false}), function(req, res, next) {
+app.get('/user', passport.authenticate('basic',  {session:false}), function(req, res) {
   res.status(200).send()
 })
 
-app.post('/user', function(req, res, next) {
+app.post('/user', function(req, res) {
   var collection = db.collection("user")
   collection.find({"username" : req.body.user}).toArray(function(e, results) {
     if (e) return next(e)
@@ -84,7 +84,7 @@ app.post('/user', function(req, res, next) {
             if (err) return callback(err);
               
             collection.insert({username: req.body.user, password: hash}, {}, function(e, results){
-              if (e) return next(e)
+              if (e) res.status(500).send()
               res.send(results)
             })
           });
@@ -95,21 +95,20 @@ app.post('/user', function(req, res, next) {
   })
 })
 
-app.post('/candy', passport.authenticate('basic',  {session:false}), function(req, res, next) {
+app.post('/candy', passport.authenticate('basic',  {session:false}), function(req, res) {
   var collection = db.collection("candy")
 
   collection.insert(req.body, {}, function(e, results){
-    if (e) return next(e)
+    if (e) res.status(500).send()
     res.send(results) 
   })
 })
 
-app.get('/candy', passport.authenticate('basic',  {session:false}), function(req, res, next) {
-  var candies = [];
+app.get('/candy', passport.authenticate('basic',  {session:false}), function(req, res) {
   var collection = db.collection("candy")
 
   collection.find({} ,{}).toArray(function(e, results){
-    if (e) return next(e)
+    if (e) res.status(500).send()
     res.send(results)
   })
 })
