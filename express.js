@@ -77,7 +77,7 @@ app.post('/user', function(req, res) {
 
     if (results.length === 0) {
       // username does not exist yet, insert it
-        bcrypt.genSalt(5, function(err, salt) {
+        bcrypt.genSalt(8, function(err, salt) {
           if (err) return callback(err);
 
           bcrypt.hash(req.body.password, salt, null, function(err, hash) {
