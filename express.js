@@ -18,29 +18,6 @@ var db = mongoskin.db('mongodb://@localhost:27017/authTestProject', {safe:true})
 
 var bcrypt = require('bcrypt-nodejs');
 
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    var collection = db.collection("user")
-    collection.find({"username" : username}).toArray(function(e, results) {
-      if (e) { return done(err); }
-      if (results.length == 0) {
-        // user does not exist
-        return done(null, false, { message: 'Incorrect username or password.' });
-      } else {
-        // incorrect password
-        bcrypt.compare(password, results[0].password, function(err, isMatch) {
-            if (err) return done(err);
-            if (isMatch) {
-              return done(null, {});        
-            } else {
-              return done(null, false, { message: 'Incorrect username or password.'});
-            }
-        });            
-        }
-    })
-  })
-);
-
 passport.use(new BasicStrategy(
   function(username, password, done) {
   var collection = db.collection("user")
@@ -72,12 +49,10 @@ app.post('/user', function(req, res) {
   var collection = db.collection("user")
   collection.find({"username" : req.body.user}).toArray(function(e, results) {
     if (e) return next(e)
-  
-    console.log(results)
 
     if (results.length === 0) {
       // username does not exist yet, insert it
-        bcrypt.genSalt(8, function(err, salt) {
+        bcrypt.genSalt(5, function(err, salt) {
           if (err) return callback(err);
 
           bcrypt.hash(req.body.password, salt, null, function(err, hash) {
